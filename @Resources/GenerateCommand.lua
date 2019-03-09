@@ -1,56 +1,55 @@
 --[[ 
 ;System Log monitor
 ;by immortalyzy
-; Last update : 2019-02-28
+; Last update : 2019-03-05
 ; Created on  : 2019-02-28
 
-; As Rainmeter does not provide loop functionalities, the scirpt will generate a command line
-;   to get all the logs demanded
---]]
---[[ --------------------------------------------------------------------------------- 
-
-
+; the scirpt will generate a command line to get all the logs demanded
 --]]
 --
 --
 --
---
---------------------------------------------------------------------------------------
 
 -- Functions used
-function mysplit(inputstr, sep)
-    if sep == nil then
-        sep = "%s"
+----------------------------------------------------------------------------------
+function split(str, pat)
+    local t = {} -- NOTE: use {n = 0} in Lua-5.0
+    local fpat = '(.-)' .. pat
+    local last_end = 1
+    local s, e, cap = str:find(fpat, 1)
+    while s do
+        if s ~= 1 or cap ~= '' then
+            table.insert(t, cap)
+        end
+        last_end = e + 1
+        s, e, cap = str:find(fpat, last_end)
     end
-    local t = {}
-    for str in string.gmatch(inputstr, "([^" .. sep .. "]+)") do
-        table.insert(t, str)
+    if last_end <= #str then
+        cap = str:sub(last_end)
+        table.insert(t, cap)
     end
     return t
 end
+----------------------------------------------------------------------------------
 
 -- Rainmeter functions
----------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------
 function Initialize()
     -- Get the logs to extract from Rainmeter
-    LogString = SKIN:GetVariable("Logs")
+    LogString = SKIN:GetVariable('Logs', 'System')
 
     -- Table of logs
-    logs = mysplit(LogString, ",")
+    logs = split(LogString, ',')
     n = #logs
-end
-
-function Update()
-    Command = ""
+    Command = ''
     for i = 1, n, 1 do
-        Command = Command .. "wevtutil qe "
+        Command = Command .. 'wevtutil qe '
         Command = Command .. logs[i]
-        Command = Command .. " /c:5 /rd:true /f:text"
+        Command = Command .. ' /c:4 /rd:true /f:text'
         if (i ~= n) then
-            Command = Command .. " && "
+            Command = Command .. ' && '
         end
     end
-    SKIN:Bang("!SetOption", "MeasureGetLogs", "Parameter", Command)
-    return Command
+    SKIN:Bang('!SetOption', 'MeasureGetLogs', 'Parameter', Command)
 end
----------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------
