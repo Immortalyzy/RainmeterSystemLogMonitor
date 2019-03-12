@@ -50,6 +50,7 @@ function Initialize()
             Command = Command .. ' && '
         end
     end
-    SKIN:Bang('!SetOption', 'MeasureGetLogs', 'Parameter', Command)
+    SKIN:Bang('!SetVariable', 'CMD', Command)
+    return Command
 end
 ----------------------------------------------------------------------------------

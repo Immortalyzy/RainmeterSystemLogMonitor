@@ -33,6 +33,10 @@ function split(str, pat)
     end
     return t
 end
+
+function compare(a, b)
+    return a.__ctime > b.__ctime
+end
 --------------------------------------------------------------------------------------
 
 -- Rainmeter functions
@@ -43,6 +47,7 @@ function Initialize()
 end
 
 function Update()
+    SKIN:Bang('!CommandMeasure', 'MeasureGetLogs', 'Run')
     _log = LogString:GetStringValue()
     local R = ''
     local Rs = {}
@@ -76,7 +81,6 @@ function Update()
                 _logss['Level'] = string.sub(_lines[j], tmp + 7)
             end
         end
-        ------
         tmp = string.find(_logs[i], 'Description:')
         if (tmp ~= nil) then
             _logss['Description'] = string.sub(_logs[i], tmp + 13)
@@ -87,23 +91,47 @@ function Update()
             end
             _logss['Content'] = desp
         end
-        -- Add to all logs
+        -- Convert date
+        local p = '(%d+)-(%d+)-(%d+)T(%d+):(%d+):(%d+)%.(%d+)'
+        local year, month, day, hour, min, sec, msec = _logss.Date:match(p)
+        offset = os.time() - os.time(os.date('!*t'))
+        _logss['__ctime'] =
+            os.time({day = day, month = month, year = year, hour = hour, min = min, sec = sec}) + offset + msec * 0.001
+        Rs[i] = _logss
+    end
+
+    -- sort according to time
+    table.sort(Rs, compare)
+
+    -- Build final string
+    for i = 1, n, 1 do
         tmps = ''
-        tmps = tmps .. _logss.Date
+        tmps = tmps .. Rs[i].Date:sub(1, 19)
         tmps = tmps .. ' -- '
-        tmps = tmps .. _logss.LogName
-        if (string.find(_logss.Level, 'Error')) then
-            tmps = tmps .. ' \t-X '
-        else
-            tmps = tmps .. ' \t-- '
+        nl = string.len(Rs[i].LogName)
+        sn = 1
+        for j = 1, sn, 1 do
+            tmps = tmps .. ' '
         end
-        tmps = tmps .. _logss.Level
-        tmps = tmps .. ' \t-- '
-        tmps = tmps .. _logss.Content
-        Rs[i] = tmps
-        -- Build final string
+        tmps = tmps .. Rs[i].LogName
+        for j = 1, 13 - sn - nl, 1 do
+            tmps = tmps .. ' '
+        end
+        tmps = tmps .. '-- '
+
+        nl = string.len(Rs[i].Level)
+        sn = 1
+        for j = 1, sn, 1 do
+            tmps = tmps .. ' '
+        end
+        tmps = tmps .. Rs[i].Level
+        for j = 1, 13 - sn - nl, 1 do
+            tmps = tmps .. ' '
+        end
+        tmps = tmps .. '\n'
+        tmps = tmps .. Rs[i].Content
         R = R .. '\n'
-        R = R .. Rs[i]
+        R = R .. tmps
         R = R .. '\n'
     end
 

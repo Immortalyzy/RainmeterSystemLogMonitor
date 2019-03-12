@@ -19,6 +19,6 @@ Logs=System, Application
 
 
 ; color in RGBA
-Color = 255,255,255,255
+Color = 155,255,155,255
 
 ; 
