@@ -44,8 +44,10 @@ function Initialize()
     Command = ''
     for i = 1, n, 1 do
         Command = Command .. 'wevtutil qe '
+        Command = Command .. '/c:4 /rd:true /f:text /l:en '
+        Command = Command .. '"'
         Command = Command .. logs[i]
-        Command = Command .. ' /c:4 /rd:true /f:text'
+        Command = Command .. '"'
         if (i ~= n) then
             Command = Command .. ' && '
         end

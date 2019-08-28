@@ -15,7 +15,7 @@
 ; 
 ; But you can specify additional logs by add the log name in the "Logs" variable, seperate by ", " (Note there is a space after ',' !!)
 ;
-Logs=System, Application
+Logs=System,Application,Microsoft-Windows-Known Folders API Service,Security,Microsoft-Windows-Shell-Core/Operational
 
 
 ; color in RGBA
